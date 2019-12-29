@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './question.dart';
-import './answer.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,30 +12,63 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const _questions = const [
+  final _questions = const [
     {
       "question": "What's your favorite color?",
-      "answers": ["Black", "Red", "Green", "White"]
+      "answers": [
+        {"text": "Black", "score": 10},
+        {"text": "Red", "score": 5},
+        {"text": "Green", "score": 3},
+        {"text": "White", "score": 1},
+      ]
     },
     {
       "question": "What's your favorite animal?",
-      "answers": ["Rabbit", "Snake", "Elephant", "Lion"]
+      "answers": [
+        {"text": "Rabbit", "score": 4},
+        {"text": "Snake", "score": 11},
+        {"text": "Elephant", "score": 6},
+        {"text": "Lion", "score": 15},
+      ]
     },
     {
       "question": "What's your favorite country?",
-      "answers": ["Brazil", "USA", "Canada"]
+      "answers": [
+        {"text": "Brazil", "score": 20},
+        {"text": "USA", "score": 1},
+        {"text": "Canada", "score": 10},
+        {"text": "France", "score": 5},
+        {"text": "Portugal", "score": 7},
+        {"text": "Germany", "score": 12},
+        {"text": "Argentina", "score": 0},
+      ]
     },
     {
       "question": "What's your favorite kind of music?",
-      "answers": ["Rock", "Blues", "Jazz", "Pop", "Reggae", "Soul"]
+      "answers": [
+        {"text": "Rock", "score": 20},
+        {"text": "Jazz", "score": 15},
+        {"text": "Pop", "score": 7},
+        {"text": "Reggae", "score": 8},
+        {"text": "Soul", "score": 8},
+        {"text": "Funk", "score": 0},
+      ]
     }
   ];
   var _index = 0;
+  var _totalScore = 0;
 
-  void _onAnswer() {
+  void _onAnswer(int score) {
     setState(() {
-      _index = (_index + 1) % _questions.length;
-      // _questions[0]["name"] = "Haha";
+      _index++;
+      _totalScore += score;
+    });
+  }
+
+  void _resetQuiz() {
+    setState(() {
+      _index = 0;
+      _totalScore = 0;
     });
   }
 
@@ -46,14 +79,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('Quiz'),
         ),
-        body: Column(
-          children: [
-            Question(_questions[_index]["question"]),
-            ...(_questions[_index]["answers"] as List<String>)
-                .map((answer) => Answer(_onAnswer, answer))
-                .toList(),
-          ],
-        ),
+        body: _index < _questions.length
+            ? Quiz(
+                question: _questions[_index]["question"],
+                answers: _questions[_index]["answers"],
+                onAnswer: _onAnswer,
+              )
+            : Result(_totalScore, _resetQuiz),
       ),
     );
   }
